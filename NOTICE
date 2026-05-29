@@ -1,0 +1,13 @@
+cymru-os
+Copyright 2026 CYMRU contributors
+
+This product includes software developed by:
+- The Buildroot project (https://buildroot.org/) — GPL-2.0
+- The Linux Foundation (https://www.kernel.org/) — GPL-2.0
+- The Reticulum Network Stack (https://reticulum.network/) — Reticulum License
+- libcodec2 (https://www.rowetel.com/?page_id=452) — LGPL-2.1
+
+Apps integrated as release artifacts (not redistributed source):
+- cymru-main (https://github.com/Hei33enberg/CYMRU) — proprietary
+- cymru-agent (Python Hermes fork from Nous Research) — MIT
+- mosadd-os (https://github.com/Hei33enberg/mosadd-os) — Apache 2.0

@@ -1,0 +1,23 @@
+# Buildroot output (huge)
+/dl/
+/output/
+buildroot/
+
+# Build artifacts
+*.o
+*.a
+*.so
+target/
+
+# RAUC bundles
+*.raucb
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db

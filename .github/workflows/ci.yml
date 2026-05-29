@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  rust-services:
+    name: Rust services (cymru-radio-d, cymru-bridge-d, cymru-mesh-d, cymru-otad)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [cymru-radio-d]
+        # Add cymru-bridge-d, cymru-mesh-d, cymru-otad as their Cargo.toml lands.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: services/${{ matrix.service }}
+      - name: rustfmt --check
+        working-directory: services/${{ matrix.service }}
+        run: cargo fmt --all -- --check
+      - name: clippy
+        working-directory: services/${{ matrix.service }}
+        run: cargo clippy --all-targets -- -D warnings
+      - name: build
+        working-directory: services/${{ matrix.service }}
+        run: cargo build --release
+      - name: test
+        working-directory: services/${{ matrix.service }}
+        run: cargo test
+
+  cross-compile-aarch64:
+    name: Cross-compile aarch64 (RPi CM5 target)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-unknown-linux-gnu
+      - name: Install cross
+        run: cargo install cross --locked
+      - name: Cross build cymru-radio-d
+        working-directory: services/cymru-radio-d
+        run: cross build --target aarch64-unknown-linux-gnu --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cymru-radio-d-aarch64
+          path: services/cymru-radio-d/target/aarch64-unknown-linux-gnu/release/cymru-radio-d
+          retention-days: 7
