@@ -4,6 +4,7 @@
 resolver = "2"
 members = [
     "services/crcp",
+    "services/robot-adapters",
     "services/cymru-radio-d",
     "services/cymru-bridge-d",
     "services/cymru-mesh-d",

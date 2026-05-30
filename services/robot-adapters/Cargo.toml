@@ -1,0 +1,10 @@
+[package]
+name = "robot-adapters"
+description = "Per-vendor CRCP adapters: translate vendor-agnostic intents into Unitree (Go2/G1) and DJI drone commands, with vendor-correct e-stop. Real SDK calls behind RobotExecutor (stubbed until hardware)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+crcp = { workspace = true }
