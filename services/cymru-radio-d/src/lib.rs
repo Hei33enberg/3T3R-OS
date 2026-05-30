@@ -6,10 +6,12 @@
 
 pub mod fec;
 pub mod frame;
+pub mod kiss;
 pub mod queue;
 pub mod radio;
 
 pub use fec::{FecError, FecProfile};
 pub use frame::{Frame, BROADCAST, MAGIC};
+pub use kiss::KissError;
 pub use queue::{Priority, TxQueue};
 pub use radio::{MockEther, MockRadio, Radio};
