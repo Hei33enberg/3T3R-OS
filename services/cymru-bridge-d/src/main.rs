@@ -13,8 +13,13 @@ use cymru_bridge_d::{Broker, Request};
 use std::io::{BufRead, Write};
 
 fn main() {
-    tracing_subscriber::fmt().with_writer(std::io::stderr).init();
-    tracing::info!("cymru-bridge-d {} — dev-bus (JSON/stdio) mock; zbus backend TODO", env!("CARGO_PKG_VERSION"));
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .init();
+    tracing::info!(
+        "cymru-bridge-d {} — dev-bus (JSON/stdio) mock; zbus backend TODO",
+        env!("CARGO_PKG_VERSION")
+    );
 
     let mut broker = Broker::new(true);
     let stdin = std::io::stdin();
@@ -28,7 +33,9 @@ fn main() {
         };
         let events = match serde_json::from_str::<Request>(&line) {
             Ok(req) => broker.handle(req),
-            Err(e) => vec![cymru_bridge_d::Event::Error { message: format!("bad request: {e}") }],
+            Err(e) => vec![cymru_bridge_d::Event::Error {
+                message: format!("bad request: {e}"),
+            }],
         };
         for ev in events {
             if let Ok(s) = serde_json::to_string(&ev) {

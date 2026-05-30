@@ -45,7 +45,11 @@ impl TxQueue {
 
     /// Enqueue a frame at the given priority.
     pub fn push(&mut self, prio: Priority, frame: Frame) {
-        self.items.push(Item { prio, seq: self.seq, frame });
+        self.items.push(Item {
+            prio,
+            seq: self.seq,
+            frame,
+        });
         self.seq += 1;
     }
 

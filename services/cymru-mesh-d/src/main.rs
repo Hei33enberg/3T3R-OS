@@ -6,5 +6,8 @@
 
 fn main() {
     tracing_subscriber::fmt::init();
-    tracing::info!("cymru-mesh-d {} — skeleton; Reticulum/LXMF wrapper TODO (C9)", env!("CARGO_PKG_VERSION"));
+    tracing::info!(
+        "cymru-mesh-d {} — skeleton; Reticulum/LXMF wrapper TODO (C9)",
+        env!("CARGO_PKG_VERSION")
+    );
 }

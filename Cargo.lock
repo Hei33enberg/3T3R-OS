@@ -143,6 +143,7 @@ name = "cymru-bridge-d"
 version = "0.1.0"
 dependencies = [
  "crcp",
+ "ed25519-dalek",
  "serde",
  "serde_json",
  "tracing",

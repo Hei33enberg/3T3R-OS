@@ -5,15 +5,26 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod robot;
+pub use robot::{RobotBroker, RobotVerdict};
+
 /// A request an app sends to the bridge (mirrors org.cymru.Radio methods).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "op", rename_all = "snake_case")]
 pub enum Request {
     /// Subscribe to a channel (""=all frames addressed to this device). Returns a sub id.
-    Subscribe { channel: String },
-    Unsubscribe { sub_id: u64 },
+    Subscribe {
+        channel: String,
+    },
+    Unsubscribe {
+        sub_id: u64,
+    },
     /// Direct send. `recipient` = hex device-id or "broadcast".
-    Send { recipient: String, channel: String, payload: Vec<u8> },
+    Send {
+        recipient: String,
+        channel: String,
+        payload: Vec<u8>,
+    },
     /// Carrier availability query.
     GetCarriers,
 }
@@ -22,12 +33,27 @@ pub enum Request {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "event", rename_all = "snake_case")]
 pub enum Event {
-    Subscribed { sub_id: u64 },
-    Unsubscribed { sub_id: u64 },
+    Subscribed {
+        sub_id: u64,
+    },
+    Unsubscribed {
+        sub_id: u64,
+    },
     /// Mirrors the `MessageReceived` signal.
-    MessageReceived { sub_id: u64, sender: String, channel: String, payload: Vec<u8> },
-    Carriers { lora_868: bool, lora_915: bool, hf_codec2: bool },
-    Error { message: String },
+    MessageReceived {
+        sub_id: u64,
+        sender: String,
+        channel: String,
+        payload: Vec<u8>,
+    },
+    Carriers {
+        lora_868: bool,
+        lora_915: bool,
+        hf_codec2: bool,
+    },
+    Error {
+        message: String,
+    },
 }
 
 /// Bus-agnostic broker. In dev (mock) mode `send` loops messages back to matching
@@ -42,7 +68,11 @@ pub struct Broker {
 
 impl Broker {
     pub fn new(loopback: bool) -> Self {
-        Broker { subs: Vec::new(), next_sub: 1, loopback }
+        Broker {
+            subs: Vec::new(),
+            next_sub: 1,
+            loopback,
+        }
     }
 
     pub fn handle(&mut self, req: Request) -> Vec<Event> {
@@ -57,8 +87,16 @@ impl Broker {
                 self.subs.retain(|(id, _)| *id != sub_id);
                 vec![Event::Unsubscribed { sub_id }]
             }
-            Request::GetCarriers => vec![Event::Carriers { lora_868: true, lora_915: false, hf_codec2: false }],
-            Request::Send { recipient, channel, payload } => {
+            Request::GetCarriers => vec![Event::Carriers {
+                lora_868: true,
+                lora_915: false,
+                hf_codec2: false,
+            }],
+            Request::Send {
+                recipient,
+                channel,
+                payload,
+            } => {
                 if !self.loopback {
                     // Real mode would hand off to cymru-radio-d here.
                     return vec![];
@@ -87,7 +125,9 @@ mod tests {
     #[test]
     fn subscribe_then_loopback_delivers() {
         let mut b = Broker::new(true);
-        let sub = b.handle(Request::Subscribe { channel: String::new() });
+        let sub = b.handle(Request::Subscribe {
+            channel: String::new(),
+        });
         let sub_id = match sub.as_slice() {
             [Event::Subscribed { sub_id }] => *sub_id,
             _ => panic!("no sub id"),
@@ -110,15 +150,24 @@ mod tests {
 
     #[test]
     fn json_request_parses() {
-        let r: Request = serde_json::from_str(r#"{"op":"send","recipient":"broadcast","channel":"","payload":[7,8]}"#).unwrap();
+        let r: Request = serde_json::from_str(
+            r#"{"op":"send","recipient":"broadcast","channel":"","payload":[7,8]}"#,
+        )
+        .unwrap();
         matches!(r, Request::Send { .. });
     }
 
     #[test]
     fn real_mode_does_not_loopback() {
         let mut b = Broker::new(false);
-        b.handle(Request::Subscribe { channel: String::new() });
-        let ev = b.handle(Request::Send { recipient: "x".into(), channel: "".into(), payload: vec![1] });
+        b.handle(Request::Subscribe {
+            channel: String::new(),
+        });
+        let ev = b.handle(Request::Send {
+            recipient: "x".into(),
+            channel: "".into(),
+            payload: vec![1],
+        });
         assert!(ev.is_empty());
     }
 }

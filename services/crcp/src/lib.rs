@@ -220,7 +220,9 @@ fn dec_at(b: &[u8], pos: &mut usize) -> Result<Cbor, String> {
             let n = read_arg(b, ai, pos)? as usize;
             let s = b.get(*pos..*pos + n).ok_or("eof text")?;
             *pos += n;
-            Ok(Cbor::Text(String::from_utf8(s.to_vec()).map_err(|_| "utf8")?))
+            Ok(Cbor::Text(
+                String::from_utf8(s.to_vec()).map_err(|_| "utf8")?,
+            ))
         }
         4 => {
             let n = read_arg(b, ai, pos)?;
@@ -317,7 +319,14 @@ pub fn decode_wire(bytes: &[u8]) -> Result<(WireHeader, Cbor), String> {
         return Err("fragmented unit: use Reassembler".into());
     }
     let (body, _) = decode(&bytes[1..])?;
-    Ok((WireHeader { version, frag, msg_type }, body))
+    Ok((
+        WireHeader {
+            version,
+            frag,
+            msg_type,
+        },
+        body,
+    ))
 }
 
 // ─────────────────────────── Fragmentation ───────────────────────────
@@ -372,7 +381,11 @@ impl Reassembler {
         let chunk = fragment.get(4..).ok_or("eof chunk")?.to_vec();
         self.total = Some(total);
         self.msg_type = Some(mt);
-        if !self.parts.iter().any(|(fid, idx, _)| *fid == frag_id && *idx == index) {
+        if !self
+            .parts
+            .iter()
+            .any(|(fid, idx, _)| *fid == frag_id && *idx == index)
+        {
             self.parts.push((frag_id, index, chunk));
         }
         if self.parts.len() as u8 == total {
@@ -408,7 +421,10 @@ mod tests {
             (Cbor::text("intent"), Cbor::text("physical.kitchen.fetch")),
             (Cbor::text("deadman_ms"), Cbor::U(3000)),
             (Cbor::text("idempotency_key"), Cbor::text("abc12345")),
-            (Cbor::text("issued_at"), Cbor::Tag(1, Box::new(Cbor::U(1_900_000_000)))),
+            (
+                Cbor::text("issued_at"),
+                Cbor::Tag(1, Box::new(Cbor::U(1_900_000_000))),
+            ),
         ];
         if let Some(s) = sig {
             pairs.push((Cbor::text("signature"), Cbor::Bytes(s)));
@@ -450,7 +466,10 @@ mod tests {
     fn preimage_excludes_signature() {
         let with = sample_task(Some(vec![7u8; 64]));
         let without = sample_task(None);
-        assert_eq!(preimage(MsgType::Task, &with), preimage(MsgType::Task, &without));
+        assert_eq!(
+            preimage(MsgType::Task, &with),
+            preimage(MsgType::Task, &without)
+        );
     }
 
     #[test]
@@ -543,7 +562,10 @@ mod tests {
             (Cbor::text("reason"), Cbor::text("operator")),
             (Cbor::text("nonce"), Cbor::Bytes(vec![9u8; 16])),
             (Cbor::text("signature"), Cbor::Bytes(vec![0u8; 64])),
-            (Cbor::text("ts"), Cbor::Tag(1, Box::new(Cbor::U(1_900_000_000)))),
+            (
+                Cbor::text("ts"),
+                Cbor::Tag(1, Box::new(Cbor::U(1_900_000_000))),
+            ),
         ]);
         assert!(estop_fits_single_packet(&estop));
     }

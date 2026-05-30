@@ -20,8 +20,20 @@ pub struct Frame {
 }
 
 impl Frame {
-    pub fn new(type_byte: u8, sender: [u8; 16], recipient: [u8; 16], channel: [u8; 4], payload: Vec<u8>) -> Self {
-        Frame { type_byte, sender, recipient, channel, payload }
+    pub fn new(
+        type_byte: u8,
+        sender: [u8; 16],
+        recipient: [u8; 16],
+        channel: [u8; 4],
+        payload: Vec<u8>,
+    ) -> Self {
+        Frame {
+            type_byte,
+            sender,
+            recipient,
+            channel,
+            payload,
+        }
     }
 
     pub fn is_broadcast(&self) -> bool {
@@ -65,7 +77,13 @@ impl Frame {
         let mut channel = [0u8; 4];
         channel.copy_from_slice(&body[33..37]);
         let payload = body[37..].to_vec();
-        Ok(Frame { type_byte, sender, recipient, channel, payload })
+        Ok(Frame {
+            type_byte,
+            sender,
+            recipient,
+            channel,
+            payload,
+        })
     }
 }
 
@@ -75,7 +93,13 @@ mod tests {
 
     #[test]
     fn frame_roundtrip() {
-        let f = Frame::new(crcp::CRCP_PAYLOAD_TYPE, [1; 16], [2; 16], [0, 0, 0, 0], vec![9, 8, 7]);
+        let f = Frame::new(
+            crcp::CRCP_PAYLOAD_TYPE,
+            [1; 16],
+            [2; 16],
+            [0, 0, 0, 0],
+            vec![9, 8, 7],
+        );
         let bytes = f.encode();
         assert_eq!(&bytes[0..2], &MAGIC);
         let g = Frame::decode(&bytes).unwrap();

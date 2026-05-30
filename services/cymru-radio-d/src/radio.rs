@@ -71,6 +71,9 @@ mod tests {
         assert_eq!(decoded_frame.type_byte, CRCP_PAYLOAD_TYPE);
         let (hdr, decoded_body) = decode_wire(&decoded_frame.payload).unwrap();
         assert_eq!(hdr.msg_type, MsgType::Telemetry);
-        assert_eq!(decoded_body.get("status").unwrap(), &Cbor::text("completed"));
+        assert_eq!(
+            decoded_body.get("status").unwrap(),
+            &Cbor::text("completed")
+        );
     }
 }

@@ -3,5 +3,8 @@
 
 fn main() {
     tracing_subscriber::fmt::init();
-    tracing::info!("cymru-otad {} — skeleton; RAUC A/B OTA TODO (C8)", env!("CARGO_PKG_VERSION"));
+    tracing::info!(
+        "cymru-otad {} — skeleton; RAUC A/B OTA TODO (C8)",
+        env!("CARGO_PKG_VERSION")
+    );
 }
