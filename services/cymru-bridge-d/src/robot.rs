@@ -148,7 +148,7 @@ impl RobotBroker {
                     (true, None) => RobotVerdict::Rejected {
                         reason: "deadman_ms required for physical agent (safety)".into(),
                     },
-                    (_, Some(ms)) if ms == 0 => RobotVerdict::Rejected {
+                    (_, Some(0)) => RobotVerdict::Rejected {
                         reason: "deadman_ms must be > 0".into(),
                     },
                     _ => {
