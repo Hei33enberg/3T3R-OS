@@ -12,6 +12,9 @@ target/
 # RAUC bundles
 *.raucb
 
+# stray local logs
+*.log
+
 # IDE
 .idea/
 .vscode/

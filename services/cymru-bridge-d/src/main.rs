@@ -13,7 +13,7 @@ use cymru_bridge_d::{Broker, Request};
 use std::io::{BufRead, Write};
 
 fn main() {
-    tracing_subscriber::fmt::with_writer(std::io::stderr).init();
+    tracing_subscriber::fmt().with_writer(std::io::stderr).init();
     tracing::info!("cymru-bridge-d {} — dev-bus (JSON/stdio) mock; zbus backend TODO", env!("CARGO_PKG_VERSION"));
 
     let mut broker = Broker::new(true);

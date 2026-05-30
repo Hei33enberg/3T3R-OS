@@ -1,7 +1,6 @@
 //! Radio backend trait + a cross-platform mock (loopback) for tests/dev.
 //! The real SX1262 SPI backend (Linux-only) implements the same [`Radio`] trait.
 
-use crate::frame::Frame;
 use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::rc::Rc;

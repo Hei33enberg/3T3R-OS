@@ -524,8 +524,13 @@ mod tests {
 
     #[test]
     fn small_unit_not_fragmented() {
-        let body = sample_task(Some(vec![5u8; 64]));
-        let frags = fragment_unit(MsgType::Task, &body, MAX_CRCP_FRAGMENT, 1);
+        // A signed TaskEnvelope (64B sig + two 16B ids) exceeds 200B and legitimately
+        // fragments (see fragmentation_roundtrip); use a genuinely small body here.
+        let small = Cbor::Map(vec![
+            (Cbor::text("protocol"), Cbor::text("crcp/1")),
+            (Cbor::text("status"), Cbor::text("ok")),
+        ]);
+        let frags = fragment_unit(MsgType::Task, &small, MAX_CRCP_FRAGMENT, 1);
         assert_eq!(frags.len(), 1);
     }
 

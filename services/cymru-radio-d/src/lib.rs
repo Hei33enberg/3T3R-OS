@@ -10,4 +10,4 @@ pub mod radio;
 
 pub use frame::{Frame, BROADCAST, MAGIC};
 pub use queue::{Priority, TxQueue};
-pub use radio::{MockRadio, Radio};
+pub use radio::{MockEther, MockRadio, Radio};
