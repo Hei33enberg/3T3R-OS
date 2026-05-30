@@ -8,6 +8,7 @@ repository.workspace = true
 
 [dependencies]
 crcp = { workspace = true }
+reed-solomon = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 

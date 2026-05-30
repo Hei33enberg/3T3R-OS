@@ -20,6 +20,7 @@ repository = "https://github.com/Hei33enberg/cymru-os"
 [workspace.dependencies]
 crcp = { path = "services/crcp" }
 ed25519-dalek = "2"
+reed-solomon = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tracing = "0.1"
