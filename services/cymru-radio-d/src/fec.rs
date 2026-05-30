@@ -75,7 +75,7 @@ pub fn encode(profile: FecProfile, payload: &[u8]) -> Result<Vec<u8>, FecError> 
     let mut logical = Vec::with_capacity(2 + payload.len());
     logical.extend_from_slice(&(payload.len() as u16).to_be_bytes());
     logical.extend_from_slice(payload);
-    while logical.len() % k != 0 {
+    while !logical.len().is_multiple_of(k) {
         logical.push(0);
     }
 
@@ -90,7 +90,7 @@ pub fn encode(profile: FecProfile, payload: &[u8]) -> Result<Vec<u8>, FecError> 
 
 /// Decode + error-correct an FEC stream produced by [`encode`].
 pub fn decode(profile: FecProfile, encoded: &[u8]) -> Result<Vec<u8>, FecError> {
-    if encoded.is_empty() || encoded.len() % 255 != 0 {
+    if encoded.is_empty() || !encoded.len().is_multiple_of(255) {
         return Err(FecError::BadBlockAlignment);
     }
     let k = profile.block_data_len();
@@ -98,9 +98,8 @@ pub fn decode(profile: FecProfile, encoded: &[u8]) -> Result<Vec<u8>, FecError> 
 
     let mut logical = Vec::with_capacity(encoded.len() / 255 * k);
     for block in encoded.chunks(255) {
-        let mut buf = block.to_vec();
         let recovered = dec
-            .correct(&mut buf, None)
+            .correct(block, None)
             .map_err(|_| FecError::Uncorrectable)?;
         logical.extend_from_slice(recovered.data());
     }

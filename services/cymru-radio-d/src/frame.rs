@@ -40,6 +40,74 @@ impl Frame {
         self.recipient == BROADCAST
     }
 
+    /// FEC profile for this frame's Type byte (RFC 0001 §FEC):
+    /// voice (0x03) gets RS(255,191); everything else RS(255,223).
+    pub fn fec_profile(&self) -> crate::fec::FecProfile {
+        match self.type_byte {
+            0x03 => crate::fec::FecProfile::Voice,
+            _ => crate::fec::FecProfile::Data,
+        }
+    }
+
+    /// Serialize to the on-air byte layout, FEC-protecting the body with the
+    /// per-type Reed-Solomon profile. Layout: `magic(2) | rs_len(u16 BE) | RS(body)`
+    /// where `body = type | sender | recipient | channel | payload`. The RS stream
+    /// length is itself a multiple of 255 (see [`crate::fec`]).
+    pub fn encode_fec(&self) -> Vec<u8> {
+        let mut body = Vec::with_capacity(1 + 16 + 16 + 4 + self.payload.len());
+        body.push(self.type_byte);
+        body.extend_from_slice(&self.sender);
+        body.extend_from_slice(&self.recipient);
+        body.extend_from_slice(&self.channel);
+        body.extend_from_slice(&self.payload);
+
+        // FEC can't fail here: body length is far below MAX_PAYLOAD.
+        let rs = crate::fec::encode(self.fec_profile(), &body).expect("fec encode");
+        let mut out = Vec::with_capacity(4 + rs.len());
+        out.extend_from_slice(&MAGIC);
+        out.extend_from_slice(&(rs.len() as u16).to_be_bytes());
+        out.extend_from_slice(&rs);
+        out
+    }
+
+    /// Parse + error-correct an on-air frame produced by [`encode_fec`].
+    /// The Type byte determines the RS profile, but it lives *inside* the FEC
+    /// stream — so we correct with both profiles and accept the one that yields a
+    /// self-consistent Type. (In practice the carrier hints the profile; this keeps
+    /// decode self-contained for tests and recovery.)
+    pub fn decode_fec(bytes: &[u8]) -> Result<Frame, String> {
+        if bytes.len() < 4 {
+            return Err("frame too short".into());
+        }
+        if bytes[0..2] != MAGIC {
+            return Err("bad magic".into());
+        }
+        let rs_len = u16::from_be_bytes([bytes[2], bytes[3]]) as usize;
+        let rs = bytes.get(4..4 + rs_len).ok_or("truncated fec stream")?;
+        // Try Data first (the common case), then Voice.
+        let body = crate::fec::decode(crate::fec::FecProfile::Data, rs)
+            .or_else(|_| crate::fec::decode(crate::fec::FecProfile::Voice, rs))
+            .map_err(|_| "fec uncorrectable".to_string())?;
+        if body.len() < 1 + 16 + 16 + 4 {
+            return Err("body too short for header".into());
+        }
+        let type_byte = body[0];
+        let mut sender = [0u8; 16];
+        sender.copy_from_slice(&body[1..17]);
+        let mut recipient = [0u8; 16];
+        recipient.copy_from_slice(&body[17..33]);
+        let mut channel = [0u8; 4];
+        channel.copy_from_slice(&body[33..37]);
+        let payload = body[37..].to_vec();
+        Ok(Frame {
+            type_byte,
+            sender,
+            recipient,
+            channel,
+            payload,
+        })
+    }
+
     /// Serialize to the on-air byte layout.
     pub fn encode(&self) -> Vec<u8> {
         let mut body = Vec::with_capacity(1 + 16 + 16 + 4 + self.payload.len());
