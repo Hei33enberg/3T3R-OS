@@ -1,0 +1,10 @@
+[package]
+name = "crcp"
+description = "CRCP wire-format codec (RFC 0003): canonical CBOR + ed25519 + fragmentation + e-stop. Cross-platform, no_std-friendly core."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+ed25519-dalek = { workspace = true }

@@ -1,0 +1,11 @@
+[package]
+name = "cymru-mesh-d"
+description = "Reticulum/LXMF mesh wrapper (transport path A: human<->human + agent dispatch). Runs as a separate daemon over IPC (license isolation). Implementation: C9 / LINEAR-2539."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

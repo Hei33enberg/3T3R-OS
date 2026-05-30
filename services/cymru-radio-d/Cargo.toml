@@ -1,33 +1,18 @@
 [package]
 name = "cymru-radio-d"
-version = "0.1.0"
-edition = "2021"
-license = "Apache-2.0"
-description = "LoRa/HF radio modem daemon for CYMRU OS — driver + D-Bus IPC bridge"
-repository = "https://github.com/Hei33enberg/cymru-os"
-readme = "README.md"
+description = "LoRa/HF radio daemon: RFC 0001 framing + TDM priority queue (e-stop preempts) + carrier mux. SX1262 SPI driver is Linux-only (TODO)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
-embedded-hal = "1"
-linux-embedded-hal = "0.4"
+crcp = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# SX1262 SPI driver deps are Linux-only; gated so the daemon logic builds/tests
+# cross-platform (CI on Linux pulls these; dev on macOS/Windows builds the core).
+[target.'cfg(target_os = "linux")'.dependencies]
 spidev = "0.6"
-tokio = { version = "1", features = ["full"] }
-zbus = "4"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-reed-solomon-erasure = "6"
-clap = { version = "4", features = ["derive"] }
-anyhow = "1"
-thiserror = "1"
-
-[[bin]]
-name = "cymru-radio-d"
-path = "src/main.rs"
-
-[profile.release]
-opt-level = "z"      # optimize for size — embedded target
-lto = true
-codegen-units = 1
-strip = true
+linux-embedded-hal = "0.4"

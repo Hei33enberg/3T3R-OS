@@ -1,0 +1,14 @@
+[package]
+name = "cymru-bridge-d"
+description = "D-Bus IPC broker (org.cymru.Radio / org.cymru.Robot). Ships a JSON-over-stdio mock 'dev-bus' so app adapters (cymru-agent) develop against the contract without hardware or a real bus. zbus backend is a follow-up."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+crcp = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

@@ -43,6 +43,7 @@ Type byte:
   0x01 = data (Reed-Solomon RS(255, 223))
   0x02 = control (Reed-Solomon RS(255, 223))
   0x03 = voice (Codec2 1300 bps, Reed-Solomon RS(255, 191))
+  0x04 = robot-dispatch (CRCP, deterministic CBOR; FEC by safety_class — see RFC 0003)
 
 Sender ID:    16 bytes (random per-device, persistent in /etc/cymru/identity)
 Recipient ID: 16 bytes (or 0xFF * 16 for broadcast)
@@ -81,7 +82,7 @@ if the hinted one is unavailable.
 
 ## Open questions
 
-- [ ] Reed-Solomon block boundary handling for payloads > 223 bytes
+- [ ] Reed-Solomon block boundary handling for payloads > 223 bytes (CRCP 0x04 fragmentation defined in RFC 0003 §4; generalize?)
 - [ ] Bluetooth LE as additional carrier for short-range device-to-device
 - [ ] M17 protocol compatibility (M17 is a competing open ham radio protocol)
 - [ ] Backoff and ARQ at this layer or at app layer?
