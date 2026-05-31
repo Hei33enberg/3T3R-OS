@@ -1,8 +1,11 @@
 //! RFC 0001 radio frame: `magic(2) | length(u16 BE) | payload`.
 //! Payload = `type(1) | sender(16) | recipient(16) | channel(4) | app_payload`.
 //!
-//! NOTE: KISS escaping + Reed-Solomon FEC are deferred (RFC 0001 §FEC, TODO);
-//! this is the structural framing the daemon and tests build on.
+//! Two on-air forms: [`Frame::encode`]/[`decode`] (plain, for tests + lossless
+//! transports) and [`Frame::encode_fec`]/[`decode_fec`] (Reed-Solomon-protected
+//! body, RFC 0001 §FEC — voice 0x03 uses RS(255,191), else RS(255,223); see
+//! [`crate::fec`]). KISS byte-stuffing (the outermost on-air wrapper) is in
+//! [`crate::kiss`].
 
 /// CYMRU magic bytes: 'C'=0xC9, 'B'(óg)=0xB0.
 pub const MAGIC: [u8; 2] = [0xC9, 0xB0];
