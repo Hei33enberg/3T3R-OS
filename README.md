@@ -16,7 +16,7 @@
 
 | Platform | Download Link | Version | Status |
 |----------|---------------|---------|--------|
-| 🪟 **Windows** | [Download CYMRU-3.1.0-x64.zip](https://github.com/Hei33enberg/CYMRU-OS/releases/download/v3.1.0/CYMRU-3.1.0-x64.zip) | v3.1.0 | ✅ Live |
+| 🪟 **Windows** | [Download CYMRU-Setup-3.1.0.exe](https://github.com/Hei33enberg/CYMRU-OS/releases/download/v3.1.0/CYMRU-Setup-3.1.0.exe) | v3.1.0 | ✅ Live |
 | 📱 **Android (APK)** | [Download cymru-3.1.0.apk](https://github.com/Hei33enberg/CYMRU-OS/releases/download/v3.1.0/cymru-3.1.0.apk) | v3.1.0 | ✅ Live |
 | 🌐 **PWA / Web App** | [Open get.cymru](https://get.cymru) | v3.1.0 | ✅ Live |
 | 🍏 **macOS** | Coming soon to Releases | v3.1.0 | 🟡 In Build |
