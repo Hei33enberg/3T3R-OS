@@ -14,13 +14,13 @@
 
 ## ⚡ Direct Downloads (Official Builds)
 
-| Platform | Download Link | Version | Status |
-|----------|---------------|---------|--------|
-| 🪟 **Windows** | [Download CYMRU-Setup-3.1.0.exe](https://github.com/Hei33enberg/CYMRU-OS/releases/download/v3.1.0/CYMRU-Setup-3.1.0.exe) | v3.1.0 | ✅ Live |
-| 📱 **Android (APK)** | [Download cymru-3.1.0.apk](https://github.com/Hei33enberg/CYMRU-OS/releases/download/v3.1.0/cymru-3.1.0.apk) | v3.1.0 | ✅ Live |
-| 🌐 **PWA / Web App** | [Open get.cymru](https://get.cymru) | v3.1.0 | ✅ Live |
-| 🍏 **macOS** | Coming soon to Releases | v3.1.0 | 🟡 In Build |
-| 🐧 **Linux (AppImage)** | Coming soon to Releases | v3.1.0 | 🟡 In Build |
+| Platform | Download Link | Status |
+|----------|---------------|--------|
+| 🪟 **Windows** | [Download CYMRU-Setup.exe](https://github.com/Hei33enberg/CYMRU-OS/releases/latest/download/CYMRU-Setup.exe) | ✅ Live |
+| 📱 **Android (APK)** | [Download cymru-latest.apk](https://github.com/Hei33enberg/CYMRU-OS/releases/latest/download/cymru-latest.apk) | ✅ Live |
+| 🌐 **PWA / Web App** | [Open get.cymru](https://get.cymru) | ✅ Live |
+| 🍏 **macOS** | Coming soon to [Releases](https://github.com/Hei33enberg/CYMRU-OS/releases/latest) | 🟡 Planned |
+| 🐧 **Linux (AppImage)** | Coming soon to [Releases](https://github.com/Hei33enberg/CYMRU-OS/releases/latest) | 🟡 Planned |
 
 ---
 
