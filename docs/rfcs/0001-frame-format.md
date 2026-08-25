@@ -1,12 +1,12 @@
 # RFC 0001 — Radio frame format
 
 **Status:** draft
-**Authors:** Major Boga (Agent CYMRU)
+**Authors:** Major Boga (3T3R)
 **Target release:** v0.1.0 (with cymru-radio-d C3)
 
 ## Context
 
-CYMRU RAYDIO devices communicate over LoRa (ISM 868/915 MHz) and optional HF
+3T3R RAYDIO devices communicate over LoRa (ISM 868/915 MHz) and optional HF
 radio. The wire format must be:
 
 1. **Magic-byte distinguishable** from any other LoRa/HF protocol so receivers
@@ -22,7 +22,7 @@ radio. The wire format must be:
 ```
 Offset   Size   Field
 -------- ------ -----------------------------------------------------
-0        2      Magic: 0xC9 0xB0 ("CYMRU" → 'C'=0xC9 'B'(óg)=0xB0)
+0        2      Magic: 0xC9 0xB0 ('C'=0xC9, 'B'=0xB0)
 2        2      Length (u16 big-endian) — bytes 4..end (excludes header)
 4        N      KISS-encoded payload (KISS frame end-byte = 0xC0)
 ```
@@ -32,7 +32,7 @@ Offset   Size   Field
 `0xC9 0xB0` chosen because:
 - High bits set on both bytes → unlikely false positive on noise/null fill
 - Not collide with KISS frame escapes (0xC0, 0xDB) or AX.25 flag (0x7E)
-- Mnemonic "C" + "Bóg"
+- Mnemonic: "C" + "Bog" — the God of the ETER
 
 ### KISS payload
 

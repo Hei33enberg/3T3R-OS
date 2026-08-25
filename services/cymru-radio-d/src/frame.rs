@@ -7,7 +7,7 @@
 //! [`crate::fec`]). KISS byte-stuffing (the outermost on-air wrapper) is in
 //! [`crate::kiss`].
 
-/// CYMRU magic bytes: 'C'=0xC9, 'B'(óg)=0xB0.
+/// Frame magic bytes: 'C'=0xC9, 'B'=0xB0 — mnemonic for "C" + "Bog" (the God of the ETER).
 pub const MAGIC: [u8; 2] = [0xC9, 0xB0];
 /// Broadcast recipient id (all-ones).
 pub const BROADCAST: [u8; 16] = [0xFF; 16];

@@ -1,13 +1,13 @@
 # RFC 0002 — D-Bus IPC contract (`org.cymru.Radio` + `org.cymru.Mesh`)
 
 **Status:** draft
-**Authors:** Major Boga (Agent CYMRU / CTO)
+**Authors:** Major Boga (3T3R / CTO)
 **Target release:** v0.1.0 (with `cymru-bridge-d` C7), `org.cymru.Mesh` lands with `cymru-mesh-d` C9
 **Supersedes:** the D-Bus sketch in [`docs/architecture/README.md`](../architecture/README.md) — that section is now informative; this RFC is normative.
 
 ## Context
 
-CYMRU RAYDIO's defining rule: **apps work standalone, with ZERO code dependency on cymru-os.** A cymru-main PWA bundle, a cymru-agent Python package and `@m0ssad/mcp` all run unmodified on the device exactly as they run on a phone or VPS.
+3T3R RAYDIO's defining rule: **apps work standalone, with ZERO code dependency on 3T3R OS.** A cymru-main PWA bundle, a cymru-agent Python package and `@m0ssad/mcp` all run unmodified on the device exactly as they run on a phone or VPS.
 
 Convergence happens **only** here, and it is **opt-in**: an app that wants off-grid radio/mesh transport asks for it over the system D-Bus bus. An app that never calls D-Bus never knows it's on hardware. This RFC is the contract between:
 
@@ -93,7 +93,7 @@ D-Bus access is gated by PolicyKit, **default deny**. Each app ships a `.policy`
 - `org.cymru.Radio.Use` — call any `org.cymru.Radio` method / receive its signals.
 - `org.cymru.Mesh.Use` — same for `org.cymru.Mesh`.
 
-The user grants/revokes per app in the CYMRU RAYDIO settings menu (cymru-main surfaces this). A fresh install grants nothing → apps behave exactly as off-device until the user opts in. `cymru-bridge-d` checks the action via `polkit` before brokering each first call from a connection and caches the verdict per-connection.
+The user grants/revokes per app in the 3T3R RAYDIO settings menu (cymru-main surfaces this). A fresh install grants nothing → apps behave exactly as off-device until the user opts in. `cymru-bridge-d` checks the action via `polkit` before brokering each first call from a connection and caches the verdict per-connection.
 
 ## Capability-flag bridge (coordination: mosadd-os D7 / [LINEAR-2362](https://linear.app/ip-ra/issue/LINEAR-2362))
 

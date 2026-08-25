@@ -1,4 +1,4 @@
-# cymru-os Architecture
+# 3T3R OS Architecture
 
 ## Layered design
 
@@ -37,9 +37,9 @@
 
 ## Critical principle
 
-cymru-os **does not modify** cymru-main or mosadd-os source code. We pull **release artifacts** (latest stable from GitHub Releases / npm) and install them as systemd units.
+3T3R OS **does not modify** the 3T3R app or mosADD OS source code. We pull **release artifacts** (latest stable from GitHub Releases / npm) and install them as systemd units.
 
-The apps don't know they're running on CYMRU RAYDIO — unless they opt-in by calling the D-Bus IPC bridge `org.cymru.Radio`.
+The apps don't know they're running on 3T3R RAYDIO — unless they opt-in by calling the D-Bus IPC bridge `org.cymru.Radio`.
 
 ## D-Bus IPC contract
 

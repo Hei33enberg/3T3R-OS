@@ -1,5 +1,8 @@
-# cymru-os Rust workspace (Apache-2.0)
-# Daemons + shared crates for the CYMRU RAYDIO convergence layer.
+# 3T3R OS Rust workspace (Apache-2.0)
+# Daemons + shared crates for the 3T3R RAYDIO convergence layer.
+# Note: crate/dir slugs (cymru-*-d), D-Bus names (org.cymru.*) and the CRCP wire
+# magic stay on the `cymru` slug on purpose — they are build/wire identifiers the
+# app talks to, exactly like the app's cymru_* DB tables. Only the brand is 3T3R.
 [workspace]
 resolver = "2"
 members = [
