@@ -36,3 +36,13 @@ Host configs (Hermes, Cursor, Codex, OpenCode, n8n, LangChain) and the five-step
 ## Status
 
 **Active alpha** · free during beta · hosted only · no third-party security audit yet. The app itself lives at 3t3r.com; everything in this repo is Apache-2.0.
+
+## Brand
+
+<p align="center">
+  <img src="img/vault-key-visual.svg" alt="The Vault — key visual" width="420" />
+  <br>
+  <strong>The Vault</strong> — RayRay's key visual: the treasure of memory, voice and ORB.
+</p>
+
+Brand assets: [`logo.svg`](logo.svg) · [`logo-512.png`](logo-512.png) · [`img/vault-key-visual.svg`](img/vault-key-visual.svg). Canon of the three brands: one wireframe body with the sun inside, one accent per brand.
