@@ -1,0 +1,20 @@
+{
+  "name": "33os-frame",
+  "private": true,
+  "version": "0.1.0",
+  "description": "33.0S - the empty frame: three columns, a live 3D center, one floating menu. Skins bring their own look and content.",
+  "license": "Apache-2.0",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @33os/shell",
+    "build": "npm run build -w @33os/shell",
+    "preview": "npm run preview -w @33os/shell",
+    "typecheck": "tsc -p packages/frame-core && tsc -p packages/frame-view && tsc -p apps/shell"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

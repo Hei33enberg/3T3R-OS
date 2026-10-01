@@ -1,0 +1,392 @@
+/*
+ * 33.0S neutral theme and layout.
+ * The frame is neutral to brand: greys on black, system type. A skin overrides the --f33-* tokens
+ * (colour, type, radius, motion) and fills the slots; it does not restyle the layout.
+ */
+:root {
+  --f33-bg: #000;
+  --f33-panel-bg: #000;
+  --f33-surface: #0d0d0f;
+  --f33-surface-raised: #16161a;
+  --f33-line: rgba(255, 255, 255, 0.08);
+  --f33-text: #f4f4f5;
+  --f33-muted: rgba(255, 255, 255, 0.58);
+  --f33-faint: rgba(255, 255, 255, 0.34);
+  --f33-slot: rgba(255, 255, 255, 0.045);
+  --f33-focus: #ffffff;
+  --f33-badge-bg: rgba(255, 255, 255, 0.16);
+  --f33-radius: 12px;
+  --f33-radius-sheet: 16px;
+  --f33-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f33-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --f33-touch: 44px;
+  --f33-bar-h: 56px;
+  --f33-panel-w: min(clamp(360px, 33.333vw, 720px), 39vw);
+  --f33-dur: 160ms;
+  --f33-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --f33-dur: 0ms;
+  }
+}
+
+.f33-frame,
+.f33-frame * {
+  box-sizing: border-box;
+}
+
+.f33-frame {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+  background: var(--f33-bg);
+  color: var(--f33-text);
+  font-family: var(--f33-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* reset with zero specificity, so component classes below always win */
+:where(.f33-frame) button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: inherit;
+}
+
+.f33-frame :focus-visible {
+  outline: 2px solid var(--f33-focus);
+  outline-offset: 2px;
+}
+
+/* ---- columns ---- */
+.f33-panel {
+  position: relative;
+  flex: 0 0 var(--f33-panel-w);
+  width: var(--f33-panel-w);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--f33-panel-bg);
+}
+.f33-panel[data-side="left"] {
+  order: 0;
+  border-right: 1px solid var(--f33-line);
+}
+.f33-panel[data-side="right"] {
+  order: 2;
+  border-left: 1px solid var(--f33-line);
+}
+.f33-center {
+  order: 1;
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+.f33-view {
+  position: absolute;
+  inset: 0;
+}
+
+/* phone: a panel opens full screen, one at a time, over the center */
+.f33-frame[data-laptop="false"] .f33-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  width: 100%;
+  border: 0;
+}
+
+/* ---- panel bar ---- */
+.f33-bar {
+  flex: 0 0 auto;
+  height: var(--f33-bar-h);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 0 6px;
+}
+.f33-panel[data-side="right"] .f33-bar {
+  flex-direction: row-reverse;
+  padding: 0 6px 0 16px;
+}
+.f33-mark {
+  width: var(--f33-touch);
+  height: var(--f33-touch);
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+.f33-glyph {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--f33-muted);
+  stroke-width: 1.4;
+}
+.f33-glyph-fill {
+  fill: var(--f33-faint);
+  stroke: none;
+}
+.f33-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.f33-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--f33-badge-bg);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- section picker: one section visible at a time ---- */
+.f33-picker {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 0 12px;
+}
+.f33-picker-head {
+  width: 100%;
+  min-height: var(--f33-touch);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 4px;
+}
+.f33-picker-label {
+  white-space: nowrap;
+  font-family: var(--f33-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--f33-muted);
+}
+.f33-hair {
+  flex: 1;
+  min-width: 16px;
+  height: 1px;
+  background: var(--f33-line);
+}
+.f33-chevron {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: var(--f33-faint);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.f33-list {
+  position: absolute;
+  z-index: 10;
+  left: 12px;
+  right: 12px;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: var(--f33-radius-sheet);
+  background: var(--f33-surface);
+  box-shadow: 0 22px 54px -18px rgba(0, 0, 0, 0.9);
+}
+
+/* ---- rows (picker list and menu) ---- */
+.f33-row {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  border-radius: var(--f33-radius);
+  transition: background var(--f33-dur) var(--f33-ease);
+}
+.f33-row:hover,
+.f33-row[aria-selected="true"] {
+  background: var(--f33-surface-raised);
+}
+.f33-row-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---- section and bottom bar ---- */
+.f33-section {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.f33-bottom {
+  flex: 0 0 auto;
+  padding: 8px 12px 12px;
+  border-top: 1px solid var(--f33-line);
+}
+
+/* ---- center: top row (marks of closed panels + view pill) ---- */
+.f33-top {
+  position: absolute;
+  z-index: 5;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+.f33-top > * {
+  pointer-events: auto;
+}
+.f33-top-side {
+  width: var(--f33-touch);
+  display: flex;
+}
+.f33-top-right {
+  justify-content: flex-end;
+}
+.f33-pill {
+  display: inline-flex;
+  padding: 4px;
+  gap: 2px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid var(--f33-line);
+}
+.f33-pill-option {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--f33-muted);
+}
+.f33-pill-option[aria-checked="true"] {
+  background: var(--f33-surface-raised);
+  color: var(--f33-text);
+}
+
+/* ---- the one floating menu ---- */
+.f33-menu-catch {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+}
+.f33-menu {
+  position: absolute;
+  z-index: 7;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.f33-menu > * {
+  pointer-events: auto;
+}
+.f33-menu-sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100% - 120px);
+  overflow: auto;
+  padding: 6px;
+  border-radius: var(--f33-radius-sheet);
+  background: var(--f33-surface);
+  box-shadow: 0 22px 54px -18px rgba(0, 0, 0, 0.9);
+}
+.f33-menu-hair {
+  margin: 6px 6px;
+  border-top: 1px solid var(--f33-line);
+}
+.f33-menu-icon {
+  width: 36px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+.f33-menu-handle {
+  height: var(--f33-touch);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--f33-line);
+  background: rgba(0, 0, 0, 0.8);
+  font-family: var(--f33-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.f33-menu-handle svg {
+  width: 14px;
+  height: 6px;
+  stroke: var(--f33-text);
+  stroke-width: 1.4;
+}
+
+/* ---- empty slot placeholder ---- */
+.f33-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  border-radius: var(--f33-radius);
+  background: var(--f33-slot);
+}
+.f33-slot-grow {
+  flex: 1 1 auto;
+}
+.f33-slot b {
+  font-family: var(--f33-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--f33-muted);
+}
+.f33-slot em {
+  font-style: normal;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--f33-text);
+}
+.f33-slot span {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--f33-faint);
+}
