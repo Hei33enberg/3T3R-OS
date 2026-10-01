@@ -1,11 +1,11 @@
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { FRAME_SLOTS, type FrameCenter, type FrameConfig, type FramePanel, type FrameSide } from './contract';
 import type { FrameLayout } from './layout';
 
-function Chevron({ dir }: { dir: 'down' | 'up' | 'right' }) {
-  const rotate = dir === 'down' ? 90 : dir === 'up' ? -90 : 0;
+/** Chevron. `end` points to the end of the line: right in left-to-right text, left in right-to-left text. */
+function Chevron({ dir }: { dir: 'down' | 'up' | 'end' }) {
   return (
-    <svg className="f33-chevron" viewBox="0 0 24 24" aria-hidden style={{ transform: `rotate(${rotate}deg)` }}>
+    <svg className={`f33-chevron f33-chevron--${dir}`} viewBox="0 0 24 24" aria-hidden>
       <path d="M9 6l6 6-6 6" />
     </svg>
   );
@@ -37,7 +37,28 @@ function PanelView({ side, panel, layout }: { side: FrameSide; panel: FramePanel
   const [selected, setSelected] = useState(panel.sections[0]?.id);
   const [pickerOpen, setPickerOpen] = useState(false);
   const listId = useId();
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLButtonElement>(null);
   const current = panel.sections.find((s) => s.id === selected) ?? panel.sections[0];
+
+  // The section list closes on Escape (focus back on its head) and on a press outside it.
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setPickerOpen(false);
+      headRef.current?.focus();
+    };
+    const onPress = (e: PointerEvent) => {
+      if (!pickerRef.current?.contains(e.target as Node)) setPickerOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('pointerdown', onPress);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('pointerdown', onPress);
+    };
+  }, [pickerOpen]);
 
   return (
     <aside className="f33-panel" data-side={side} aria-label={panel.title}>
@@ -56,8 +77,9 @@ function PanelView({ side, panel, layout }: { side: FrameSide; panel: FramePanel
       </header>
 
       {current && (
-        <div className="f33-picker">
+        <div className="f33-picker" ref={pickerRef}>
           <button
+            ref={headRef}
             type="button"
             className="f33-picker-head"
             aria-expanded={pickerOpen}
@@ -158,7 +180,7 @@ function FloatingMenu({ center, initialOpen }: { center: FrameCenter; initialOpe
                 >
                   <span className="f33-menu-icon" aria-hidden>{item.icon}</span>
                   <span className="f33-row-label">{item.label}</span>
-                  {item.opensScreen && <Chevron dir="right" />}
+                  {item.opensScreen && <Chevron dir="end" />}
                 </button>
               </div>
             ))}

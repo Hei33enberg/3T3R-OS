@@ -16,7 +16,9 @@ npm run build      # apps/shell/dist — static files, run from any folder or st
 npm run typecheck
 ```
 
-Preview switches for reviews and screenshots: `?left=0|1&right=0|1&menu=1`.
+Preview switches for reviews and screenshots: `?left=0|1&right=0|1&menu=1&dir=rtl`.
+
+The frame uses logical CSS properties, so a right-to-left document mirrors it: the start panel stands on the right. Escape closes the section list and the menu; a press outside closes them too.
 
 ## What is inside
 

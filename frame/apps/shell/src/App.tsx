@@ -6,9 +6,10 @@ import { FrameStage } from '@33os/frame-view';
  * The empty 33.0S frame. Every slot is filled with a placeholder that shows the slot's name,
  * so an app team can see where its content goes. Replace the placeholders with your app.
  *
- * Preview switches (for screenshots and reviews): ?left=0|1 &right=0|1 &menu=1
+ * Preview switches (for screenshots and reviews): ?left=0|1 &right=0|1 &menu=1 &dir=rtl
  */
 const params = new URLSearchParams(window.location.search);
+if (params.get('dir') === 'rtl') document.documentElement.dir = 'rtl';
 const flag = (name: string): boolean | undefined => (params.has(name) ? params.get(name) === '1' : undefined);
 
 function emptySections(side: 'left' | 'right'): FrameSection[] {
