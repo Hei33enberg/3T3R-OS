@@ -12,11 +12,15 @@ const params = new URLSearchParams(window.location.search);
 if (params.get('dir') === 'rtl') document.documentElement.dir = 'rtl';
 const flag = (name: string): boolean | undefined => (params.has(name) ? params.get(name) === '1' : undefined);
 
+/** Left: a rail of sections, each with its own search and setup (^). Right: swipe tabs. */
 function emptySections(side: 'left' | 'right'): FrameSection[] {
-  return [1, 2, 3].map((n) => ({
+  const count = side === 'left' ? 6 : 4;
+  return Array.from({ length: count }, (_, i) => i + 1).map((n) => ({
     id: `${side}-${n}`,
-    label: `Section ${n}`,
-    render: () => <SlotBox slot={`${side}.section`} note={`Section ${n}`} grow />,
+    label: side === 'left' ? `Section ${n}` : `Tab ${n}`,
+    search: side === 'left' ? <SlotBox slot="left.search" /> : undefined,
+    setup: side === 'left' ? () => <SlotBox slot="left.section" note={`Section ${n} setup`} /> : undefined,
+    render: () => <SlotBox slot={`${side}.section`} note={side === 'left' ? `Section ${n}` : `Tab ${n}`} grow />,
   }));
 }
 
@@ -47,6 +51,7 @@ export function App() {
     },
     right: {
       title: 'Right',
+      top: <SlotBox slot="right.top" />,
       sections: emptySections('right'),
       bottom: <SlotBox slot="right.footer" />,
     },

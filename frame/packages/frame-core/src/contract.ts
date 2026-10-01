@@ -14,15 +14,26 @@ export type FrameColumn = FrameSide | 'center';
 /** One section of a side panel. Only one section of a panel is visible at a time. */
 export interface FrameSection {
   id: string;
-  /** Name shown in the section picker. */
+  /** Name shown on the rail or tab. */
   label: string;
   /** Optional counter next to the name. */
   count?: number;
+  /** Search within this section, pinned under the section header (rail panels). */
+  search?: ReactNode;
+  /** Setup of this section, opened with ^ on the section header ("wejście głębiej"). */
+  setup?: () => ReactNode;
   /** Content of the section. Rendered only while the section is selected. */
   render: () => ReactNode;
 }
 
-/** A side panel: bar, section picker, the selected section and a bar pinned to the bottom. */
+/**
+ * How a panel switches its sections.
+ * - `rail`: a vertical rail, always visible, beside the selected section (the left panel of the drawing).
+ * - `tabs`: a row of tabs that scrolls sideways (the swipe menu of the right panel).
+ */
+export type FrameSectionSwitch = 'rail' | 'tabs';
+
+/** A side panel: bar, optional top, section switch, the selected section and a bar pinned to the bottom. */
 export interface FramePanel {
   /** Title in the panel bar. */
   title: string;
@@ -30,6 +41,10 @@ export interface FramePanel {
   count?: number;
   /** The panel's mark: the control that opens and closes it. The skin brings its own glyph. */
   mark?: ReactNode;
+  /** How the sections switch. Default: `rail` on the left panel, `tabs` on the right panel. */
+  sectionSwitch?: FrameSectionSwitch;
+  /** Content above the section tabs, visible with every section (tabs panels only). */
+  top?: ReactNode;
   /** Sections of the panel. The first one is selected at start. */
   sections: FrameSection[];
   /** Bar pinned to the bottom of the panel, visible with every section (left: dock, right: footer). */
@@ -84,14 +99,16 @@ export interface FrameSlot {
 /** Every place a skin can fill. Ids are stable; documentation and placeholders use them. */
 export const FRAME_SLOTS: readonly FrameSlot[] = [
   { id: 'left.bar', column: 'left', what: 'Panel bar: mark (opens and closes the panel), title, counter.' },
-  { id: 'left.sections', column: 'left', what: 'Section picker: the main products of the app, one visible at a time.' },
-  { id: 'left.section', column: 'left', what: 'The selected section.' },
+  { id: 'left.sections', column: 'left', what: 'Section rail: the main products of the app, always visible beside the selected section.' },
+  { id: 'left.search', column: 'left', what: 'Search within the selected section, under its header (^ opens the section setup).' },
+  { id: 'left.section', column: 'left', what: 'The selected section, laid out as the app needs.' },
   { id: 'left.dock', column: 'left', what: 'Bar pinned to the bottom of the left panel, visible with every section.' },
   { id: 'center.views', column: 'center', what: 'Pill at the top of the center that switches the view.' },
   { id: 'center.view', column: 'center', what: 'The live center: a 3D stage the skin fills with its scene.' },
   { id: 'center.menu', column: 'center', what: 'The one floating menu of the center. No other bars or buttons on the center.' },
   { id: 'right.bar', column: 'right', what: 'Panel bar: mark (opens and closes the panel), title, counter.' },
-  { id: 'right.sections', column: 'right', what: 'Section picker of the right panel, one visible at a time.' },
+  { id: 'right.top', column: 'right', what: 'Top of the right panel, visible with every section (for example a message and a memory teaser).' },
+  { id: 'right.sections', column: 'right', what: 'Section tabs of the right panel: a swipe row, one section visible at a time.' },
   { id: 'right.section', column: 'right', what: 'The selected section.' },
   { id: 'right.footer', column: 'right', what: 'Footer pinned to the bottom of the right panel.' },
 ] as const;

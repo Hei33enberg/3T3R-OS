@@ -35,14 +35,16 @@ Stack: TypeScript, React 18, Vite 5, three 0.160, @react-three/fiber 8, @react-t
 | Slot | What goes there |
 |---|---|
 | `left.bar` | Panel bar: mark (opens and closes the panel), title, counter. |
-| `left.sections` | Section picker: the main products of the app, one visible at a time. |
-| `left.section` | The selected section. |
+| `left.sections` | Section rail: the main products of the app, always visible beside the selected section. |
+| `left.search` | Search within the selected section, under its header; ^ on the header opens the section setup. |
+| `left.section` | The selected section, laid out as the app needs. |
 | `left.dock` | Bar pinned to the bottom of the left panel, visible with every section. |
 | `center.views` | Pill at the top of the center that switches the view. |
 | `center.view` | The live center: a 3D stage the app fills with its scene. |
 | `center.menu` | The one floating menu of the center. No other bars or buttons on the center. |
 | `right.bar` | Panel bar of the right panel. |
-| `right.sections` | Section picker of the right panel, one visible at a time. |
+| `right.top` | Top of the right panel, visible with every section (for example a message and a memory teaser). |
+| `right.sections` | Section tabs of the right panel: a swipe row, one section visible at a time. |
 | `right.section` | The selected section. |
 | `right.footer` | Footer pinned to the bottom of the right panel. |
 
@@ -60,14 +62,14 @@ Stack: TypeScript, React 18, Vite 5, three 0.160, @react-three/fiber 8, @react-t
    }
    ```
 
-2. **Sections = slots.** Describe both panels in a `FrameConfig`. Each panel has `sections` (one visible at a time, each with its own `render()`), an optional `count` and a `bottom` bar (the dock on the left, the footer on the right).
+2. **Sections = slots.** Describe both panels in a `FrameConfig`. The left panel switches sections with a **rail** that stays visible beside the selected section; the right panel with **tabs** you can swipe (`sectionSwitch` changes this). Each section has its own `render()`, and on the rail also an optional `search` and `setup` (opened with ^ on the section header). The right panel has a `top` above its tabs. Both panels have a `bottom` bar (the dock on the left, the footer on the right).
 
    ```tsx
    const layout = useFrameLayout();
    const config: FrameConfig = {
-     left:  { title: 'Ops', sections: [{ id: 'inbox', label: 'Inbox', render: () => <Inbox /> }], bottom: <Dock /> },
+     left:  { title: 'Ops', sections: [{ id: 'inbox', label: 'Inbox', search: <InboxSearch />, render: () => <Inbox /> }], bottom: <Dock /> },
      center: { view: <FrameStage paused={layout.centerCovered}><YourScene /></FrameStage>, menu: [...] },
-     right: { title: 'Account', sections: [...], bottom: <Footer /> },
+     right: { title: 'Account', top: <Message />, sections: [...], bottom: <Footer /> },
    };
    return <FrameShell config={config} layout={layout} />;
    ```
@@ -82,8 +84,8 @@ Stack: TypeScript, React 18, Vite 5, three 0.160, @react-three/fiber 8, @react-t
 
 1. Add `@33os/frame-core` and `@33os/frame-view` to the app and mount `FrameShell` as the main screen.
 2. Map the mosADD design tokens to the `--f33-*` variables. The frame keeps no mosADD colours.
-3. Left panel: one section per main operational product of the app, one visible at a time; the dock stays at the bottom with every section.
-4. Right panel: the account side of the app in sections, with the footer at the bottom.
+3. Left panel: one rail item per main operational product of the app; the selected product's view stands beside the rail with its own header, search and setup; the dock stays at the bottom with every section.
+4. Right panel: the top of the panel, then the account side of the app in swipe tabs, with the footer at the bottom.
 5. Center: the app's own 3D scene as a child of `FrameStage`; keep panels beside it on a laptop, and pause it when a phone panel covers it.
 6. Menu: the app's center entries go into the one floating menu; no new bars or buttons on the center.
 7. Data: read everything the screens show through the app's m.0S hub client.

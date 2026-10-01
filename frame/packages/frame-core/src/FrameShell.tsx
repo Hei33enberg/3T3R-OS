@@ -1,5 +1,13 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { FRAME_SLOTS, type FrameCenter, type FrameConfig, type FramePanel, type FrameSide } from './contract';
+import { useEffect, useId, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react';
+import {
+  FRAME_SLOTS,
+  type FrameCenter,
+  type FrameConfig,
+  type FramePanel,
+  type FrameSection,
+  type FrameSectionSwitch,
+  type FrameSide,
+} from './contract';
 import type { FrameLayout } from './layout';
 
 /** Chevron. `end` points to the end of the line: right in left-to-right text, left in right-to-left text. */
@@ -33,35 +41,106 @@ export function SlotBox({ slot, note, grow }: { slot: string; note?: string; gro
   );
 }
 
+/** Header of the selected section: its name, a hairline and ^ that opens the section setup. */
+function SectionHead({ section, setupOpen, onSetup }: { section: FrameSection; setupOpen: boolean; onSetup: () => void }) {
+  return (
+    <div className="f33-head">
+      <span className="f33-head-label">{section.label}</span>
+      {section.count !== undefined && <span className="f33-count">{section.count}</span>}
+      <span className="f33-hair" aria-hidden />
+      {section.setup && (
+        <button
+          type="button"
+          className="f33-setup"
+          aria-expanded={setupOpen}
+          aria-label={`${section.label} setup`}
+          onClick={onSetup}
+        >
+          <Chevron dir={setupOpen ? 'down' : 'up'} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Section switch: a vertical rail (always visible) or a row of tabs that scrolls sideways. Arrow keys move along it. */
+function SectionSwitch({
+  kind,
+  panel,
+  current,
+  onSelect,
+}: {
+  kind: FrameSectionSwitch;
+  panel: FramePanel;
+  current: FrameSection;
+  onSelect: (id: string) => void;
+}) {
+  const onKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    const next = kind === 'rail' ? ['ArrowDown', 'ArrowUp'] : ['ArrowRight', 'ArrowLeft'];
+    const step = e.key === next[0] ? 1 : e.key === next[1] ? -1 : 0;
+    if (!step) return;
+    e.preventDefault();
+    const dir = kind === 'tabs' && document.documentElement.dir === 'rtl' ? -step : step;
+    const i = panel.sections.findIndex((s) => s.id === current.id);
+    const target = panel.sections[(i + dir + panel.sections.length) % panel.sections.length];
+    onSelect(target.id);
+    const el = e.currentTarget.querySelector<HTMLButtonElement>(`[data-id="${CSS.escape(target.id)}"]`);
+    el?.focus();
+  };
+  return (
+    <div
+      className={kind === 'rail' ? 'f33-rail' : 'f33-tabs'}
+      role="tablist"
+      aria-orientation={kind === 'rail' ? 'vertical' : 'horizontal'}
+      aria-label={`${panel.title} sections`}
+      onKeyDown={onKey}
+    >
+      {panel.sections.map((s) => {
+        const on = s.id === current.id;
+        return (
+          <button
+            key={s.id}
+            type="button"
+            role="tab"
+            data-id={s.id}
+            aria-selected={on}
+            tabIndex={on ? 0 : -1}
+            className={kind === 'rail' ? 'f33-rail-item' : 'f33-tab'}
+            onClick={() => onSelect(s.id)}
+          >
+            <span className="f33-row-label">{s.label}</span>
+            {s.count !== undefined && <span className="f33-count">{s.count}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function PanelView({ side, panel, layout }: { side: FrameSide; panel: FramePanel; layout: FrameLayout }) {
   const [selected, setSelected] = useState(panel.sections[0]?.id);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const listId = useId();
-  const pickerRef = useRef<HTMLDivElement>(null);
-  const headRef = useRef<HTMLButtonElement>(null);
+  const [setupOpen, setSetupOpen] = useState(false);
   const current = panel.sections.find((s) => s.id === selected) ?? panel.sections[0];
+  const kind: FrameSectionSwitch = panel.sectionSwitch ?? (side === 'left' ? 'rail' : 'tabs');
 
-  // The section list closes on Escape (focus back on its head) and on a press outside it.
-  useEffect(() => {
-    if (!pickerOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      setPickerOpen(false);
-      headRef.current?.focus();
-    };
-    const onPress = (e: PointerEvent) => {
-      if (!pickerRef.current?.contains(e.target as Node)) setPickerOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    window.addEventListener('pointerdown', onPress);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener('pointerdown', onPress);
-    };
-  }, [pickerOpen]);
+  const select = (id: string) => {
+    setSelected(id);
+    setSetupOpen(false);
+  };
+
+  const body = current && (
+    <>
+      {kind === 'rail' && <SectionHead section={current} setupOpen={setupOpen} onSetup={() => setSetupOpen((v) => !v)} />}
+      {setupOpen && current.setup && <div className="f33-setup-body">{current.setup()}</div>}
+      {current.search && <div className="f33-search">{current.search}</div>}
+      <div className="f33-section" role="tabpanel" aria-label={current.label}>
+        {current.render()}
+      </div>
+    </>
+  );
 
   return (
-    <aside className="f33-panel" data-side={side} aria-label={panel.title}>
+    <aside className="f33-panel" data-side={side} data-switch={kind} aria-label={panel.title}>
       <header className="f33-bar">
         <button
           type="button"
@@ -76,50 +155,22 @@ function PanelView({ side, panel, layout }: { side: FrameSide; panel: FramePanel
         {panel.count !== undefined && <span className="f33-count">{panel.count}</span>}
       </header>
 
-      {current && (
-        <div className="f33-picker" ref={pickerRef}>
-          <button
-            ref={headRef}
-            type="button"
-            className="f33-picker-head"
-            aria-expanded={pickerOpen}
-            aria-controls={listId}
-            onClick={() => setPickerOpen((v) => !v)}
-          >
-            <span className="f33-picker-label">{current.label}</span>
-            {current.count !== undefined && <span className="f33-count">{current.count}</span>}
-            <span className="f33-hair" aria-hidden />
-            <Chevron dir={pickerOpen ? 'up' : 'down'} />
-          </button>
-          {pickerOpen && (
-            <ul className="f33-list" id={listId} role="listbox" aria-label={`${panel.title} sections`}>
-              {panel.sections.map((s) => (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={s.id === current.id}
-                    className="f33-row"
-                    onClick={() => {
-                      setSelected(s.id);
-                      setPickerOpen(false);
-                    }}
-                  >
-                    <span className="f33-row-label">{s.label}</span>
-                    {s.count !== undefined && <span className="f33-count">{s.count}</span>}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+      {kind === 'rail' ? (
+        <div className="f33-cols">
+          {current && <SectionSwitch kind="rail" panel={panel} current={current} onSelect={select} />}
+          <div className="f33-col">
+            {body}
+            {panel.bottom && <div className="f33-bottom">{panel.bottom}</div>}
+          </div>
         </div>
+      ) : (
+        <>
+          {panel.top && <div className="f33-panel-top">{panel.top}</div>}
+          {current && <SectionSwitch kind="tabs" panel={panel} current={current} onSelect={select} />}
+          {body}
+          {panel.bottom && <div className="f33-bottom">{panel.bottom}</div>}
+        </>
       )}
-
-      <div className="f33-section" role="region" aria-label={current?.label}>
-        {current?.render()}
-      </div>
-
-      {panel.bottom && <div className="f33-bottom">{panel.bottom}</div>}
     </aside>
   );
 }

@@ -22,6 +22,7 @@
   --f33-touch: 44px;
   --f33-bar-h: 56px;
   --f33-panel-w: min(clamp(360px, 33.333vw, 720px), 39vw);
+  --f33-rail-w: clamp(96px, 34%, 168px);
   --f33-dur: 160ms;
   --f33-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -155,21 +156,100 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- section picker: one section visible at a time ---- */
-.f33-picker {
-  position: relative;
-  flex: 0 0 auto;
-  padding: 0 12px;
+/* ---- section switch: a rail beside the section (left) or swipe tabs (right) ---- */
+.f33-cols {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
 }
-.f33-picker-head {
+.f33-rail {
+  flex: 0 0 var(--f33-rail-w);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 6px 12px;
+  overflow-y: auto;
+  border-inline-end: 1px solid var(--f33-line);
+}
+.f33-rail-item {
+  position: relative;
   width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--f33-radius);
+  color: var(--f33-muted);
+  transition: background var(--f33-dur) var(--f33-ease);
+}
+.f33-rail-item .f33-row-label {
+  font-size: 14px;
+  white-space: normal;
+  line-height: 1.25;
+}
+.f33-rail-item:hover {
+  background: var(--f33-surface);
+}
+.f33-rail-item[aria-selected="true"] {
+  background: var(--f33-surface-raised);
+  color: var(--f33-text);
+}
+.f33-col {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.f33-panel-top {
+  flex: 0 0 auto;
+  padding: 0 12px 8px;
+}
+.f33-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 2px;
+  margin: 4px 12px 8px;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--f33-surface);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.f33-tab {
+  flex: 1 0 auto;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+  border-radius: 999px;
+  scroll-snap-align: start;
+  color: var(--f33-muted);
+}
+.f33-tab .f33-row-label {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.f33-tab[aria-selected="true"] {
+  background: var(--f33-surface-raised);
+  color: var(--f33-text);
+}
+.f33-head {
+  flex: 0 0 auto;
   min-height: var(--f33-touch);
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 4px;
+  padding: 0 12px 0 16px;
 }
-.f33-picker-label {
+.f33-head-label {
   white-space: nowrap;
   font-family: var(--f33-mono);
   font-size: 11px;
@@ -182,6 +262,19 @@
   min-width: 16px;
   height: 1px;
   background: var(--f33-line);
+}
+.f33-setup {
+  width: var(--f33-touch);
+  height: var(--f33-touch);
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  margin-inline-end: -10px;
+}
+.f33-setup-body,
+.f33-search {
+  flex: 0 0 auto;
+  padding: 0 12px 8px;
 }
 .f33-chevron--down {
   transform: rotate(90deg);
@@ -202,20 +295,7 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.f33-list {
-  position: absolute;
-  z-index: 10;
-  inset-inline: 12px;
-  top: calc(100% + 4px);
-  margin: 0;
-  padding: 6px;
-  list-style: none;
-  border-radius: var(--f33-radius-sheet);
-  background: var(--f33-surface);
-  box-shadow: 0 22px 54px -18px rgba(0, 0, 0, 0.9);
-}
-
-/* ---- rows (picker list and menu) ---- */
+/* ---- rows (menu) ---- */
 .f33-row {
   width: 100%;
   min-height: 56px;
