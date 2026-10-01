@@ -1,0 +1,28 @@
+/* Shell-only: the label of the empty center. Not part of the frame. */
+.shell-center-label {
+  position: absolute;
+  z-index: 4;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  pointer-events: none;
+}
+.shell-center-label b {
+  font-family: var(--f33-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--f33-muted);
+}
+.shell-center-label span {
+  font-size: 13px;
+  color: var(--f33-faint);
+}

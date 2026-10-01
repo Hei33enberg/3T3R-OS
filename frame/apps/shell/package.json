@@ -1,0 +1,29 @@
+{
+  "name": "@33os/shell",
+  "private": true,
+  "version": "0.1.0",
+  "description": "33.0S empty shell: the frame with every slot labelled by its name. Start here to put an app into the frame.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4333 --strictPort"
+  },
+  "dependencies": {
+    "@33os/frame-core": "*",
+    "@33os/frame-view": "*",
+    "@react-three/drei": "9.122.0",
+    "@react-three/fiber": "8.18.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "0.160.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/three": "^0.160.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}
