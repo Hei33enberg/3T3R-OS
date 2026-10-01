@@ -67,7 +67,7 @@ What runs today, and what does not. Measured 01.10.2026.
 | 33.0S — panels with sections beside a live 3D center | ○ COMING. In build inside the 3T3R app. |
 | 3t3r.com as a client of the m.0S hub | ○ COMING |
 | mosadd.com on the frame (version B) | ○ COMING. After version A. |
-| The frame's own code in this repository | Not published. |
+| The frame's own code in this repository | [`frame/`](frame/) — the empty frame, in build. Start with [`frame/README.md`](frame/README.md). |
 
 ## //05 Services in this repository.
 
