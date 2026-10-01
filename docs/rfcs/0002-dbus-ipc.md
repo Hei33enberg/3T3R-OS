@@ -1,24 +1,26 @@
 # RFC 0002 — D-Bus IPC contract (`org.cymru.Radio` + `org.cymru.Mesh`)
 
 **Status:** draft
-**Authors:** Major Boga (3T3R / CTO)
+**Authors:** 3T3R Engineering
 **Target release:** v0.1.0 (with `cymru-bridge-d` C7), `org.cymru.Mesh` lands with `cymru-mesh-d` C9
 **Supersedes:** the D-Bus sketch in [`docs/architecture/README.md`](../architecture/README.md) — that section is now informative; this RFC is normative.
 
+> Part of the experimental radio-node prototype — not the 33.0S frame and not a product.
+
 ## Context
 
-3T3R RAYDIO's defining rule: **apps work standalone, with ZERO code dependency on 3T3R OS.** A cymru-main PWA bundle, a cymru-agent Python package and `@m0ssad/mcp` all run unmodified on the device exactly as they run on a phone or VPS.
+The radio node's defining rule: **apps work standalone, with ZERO code dependency on this radio layer.** The 3T3R app's web bundle, the agent runtime's Python package and `@mosadd/mcp` all run unmodified on the device exactly as they run on a phone or VPS.
 
 Convergence happens **only** here, and it is **opt-in**: an app that wants off-grid radio/mesh transport asks for it over the system D-Bus bus. An app that never calls D-Bus never knows it's on hardware. This RFC is the contract between:
 
-- **Producers** (cymru-os services): `cymru-bridge-d` (C7) owns the bus names and brokers; `cymru-radio-d` (C3) backs `org.cymru.Radio`; `cymru-mesh-d` (C9) backs `org.cymru.Mesh`.
-- **Consumers** (release artifacts): cymru-main (PTT voice turns), cymru-agent (skill-dispatch envelopes), `@m0ssad/mcp` (mDM/mTALK frames).
+- **Producers** (services in this repository): `cymru-bridge-d` (C7) owns the bus names and brokers; `cymru-radio-d` (C3) backs `org.cymru.Radio`; `cymru-mesh-d` (C9) backs `org.cymru.Mesh`.
+- **Consumers** (release artifacts): the 3T3R app (PTT voice turns), the agent runtime (skill-dispatch envelopes), `@mosadd/mcp` (mDM/mTALK frames).
 
 The wire format below the bus is [RFC 0001](./0001-frame-format.md); this RFC never duplicates it — D-Bus payloads are opaque `ay` byte arrays that `cymru-radio-d` wraps into KISS frames.
 
 ## Bus topology
 
-- **Bus:** system bus (`/run/dbus/system_bus_socket`). Not session bus — services are long-lived systemd units (see cymru-agent `packaging/systemd/cymru-agent.service`).
+- **Bus:** system bus (`/run/dbus/system_bus_socket`). Not session bus — services are long-lived systemd units.
 - **Well-known names:** `org.cymru.Radio`, `org.cymru.Mesh` (both owned by `cymru-bridge-d`, which proxies to `cymru-radio-d` / `cymru-mesh-d` over private peer sockets).
 - **Object paths:** `/org/cymru/Radio`, `/org/cymru/Mesh`. Subscriptions get child paths `/org/cymru/Radio/sub/<u>`.
 
@@ -38,7 +40,7 @@ Direct radio transport (RFC 0001 frames over LoRa/HF). Connectionless, best-effo
 
 `recipient`/`channel` are **strings** at the bus boundary for ergonomics; `cymru-radio-d` deterministically maps them to RFC 0001 16-byte Sender/Recipient IDs and the 4-byte Channel ID (BLAKE3-128 truncation, documented in cymru-radio-d). Apps never see raw IDs.
 
-`payload` is `ay` (byte array), **not** `s` — the architecture sketch used `string`, but app payloads are already-encrypted binary (`@m0ssad/crypto` Double Ratchet, cymru voice frames). Forcing UTF-8 would corrupt them.
+`payload` is `ay` (byte array), **not** `s` — the architecture sketch used `string`, but app payloads are already-encrypted binary (end-to-end encrypted messages, voice frames). Forcing UTF-8 would corrupt them.
 
 ### Signals
 
@@ -93,11 +95,11 @@ D-Bus access is gated by PolicyKit, **default deny**. Each app ships a `.policy`
 - `org.cymru.Radio.Use` — call any `org.cymru.Radio` method / receive its signals.
 - `org.cymru.Mesh.Use` — same for `org.cymru.Mesh`.
 
-The user grants/revokes per app in the 3T3R RAYDIO settings menu (cymru-main surfaces this). A fresh install grants nothing → apps behave exactly as off-device until the user opts in. `cymru-bridge-d` checks the action via `polkit` before brokering each first call from a connection and caches the verdict per-connection.
+The user grants/revokes per app in the device's settings menu. A fresh install grants nothing → apps behave exactly as off-device until the user opts in. `cymru-bridge-d` checks the action via `polkit` before brokering each first call from a connection and caches the verdict per-connection.
 
-## Capability-flag bridge (coordination: mosadd-os D7 / [LINEAR-2362](https://linear.app/ip-ra/issue/LINEAR-2362))
+## Capability-flag bridge (coordination with mosADD-OS)
 
-`@m0ssad/mcp` tools declare `meta.requires: "network" | "radio" | "any"`. The host (`npx @m0ssad/mcp` under cymru-os, or cymru-agent) filters the advertised toolset by **live transport availability**:
+`@mosadd/mcp` tools declare `meta.requires: "network" | "radio" | "any"`. The host (`npx @mosadd/mcp` on the radio node, or the agent runtime) filters the advertised toolset by **live transport availability**:
 
 | `requires` | Available iff | Routing |
 |------------|---------------|---------|
@@ -105,11 +107,11 @@ The user grants/revokes per app in the 3T3R RAYDIO settings menu (cymru-main sur
 | `radio` | `GetCarrierAvailability()` has any `true` | `org.cymru.Radio` (direct) or `org.cymru.Mesh` (relayed) |
 | `any` | either of the above | prefer IP, fall back to radio/mesh |
 
-This is the **one place** the mosadd standalone contract and the cymru-os convergence layer touch — and it touches through a string enum and this bus, never through shared code. The `requires` enum string syntax is owned by mosadd-os (D7); this RFC consumes it. **Any change to the enum is a `requires:cymru-input` coordination event.**
+This is the **one place** the mosADD standalone contract and this radio layer touch — and it touches through a string enum and this bus, never through shared code. The `requires` enum string syntax is owned by mosADD-OS; this RFC consumes it. **Any change to the enum needs coordination between both repositories.**
 
 ## Introspection (codegen source of truth)
 
-`cymru-bridge-d` (zbus, Rust) generates server stubs from, and apps introspect, the XML in [`docs/dbus-api/org.cymru.Radio.xml`](../dbus-api/) (to be added alongside C7 implementation). The XML is generated from this RFC, not hand-edited divergently — RFC is normative, XML is the machine-readable projection.
+`cymru-bridge-d` (zbus, Rust) generates server stubs from, and apps introspect, the XML in `docs/dbus-api/org.cymru.Radio.xml` (not yet in this repository; to be added alongside the C7 implementation). The XML is generated from this RFC, not hand-edited divergently — RFC is normative, XML is the machine-readable projection.
 
 ## Open questions
 

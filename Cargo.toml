@@ -1,8 +1,8 @@
-# 3T3R OS Rust workspace (Apache-2.0)
-# Daemons + shared crates for the 3T3R RAYDIO convergence layer.
-# Note: crate/dir slugs (cymru-*-d), D-Bus names (org.cymru.*) and the CRCP wire
-# magic stay on the `cymru` slug on purpose — they are build/wire identifiers the
-# app talks to, exactly like the app's cymru_* DB tables. Only the brand is 3T3R.
+# 33.0S (3T3R OS) by 3T3R ENGINEERING - Rust workspace (Apache-2.0).
+# Experimental radio-node prototype: daemons and shared crates. Not the 33.0S frame.
+# Note: crate/dir slugs (cymru-*-d), D-Bus names (org.cymru.*) and wire identifiers
+# keep the legacy `cymru` slug on purpose - they are build/wire identifiers the
+# apps talk to, not product names.
 [workspace]
 resolver = "2"
 members = [
@@ -18,7 +18,7 @@ members = [
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
-repository = "https://github.com/Hei33enberg/cymru-os"
+repository = "https://github.com/Hei33enberg/3T3R-OS"
 
 [workspace.dependencies]
 crcp = { path = "services/crcp" }

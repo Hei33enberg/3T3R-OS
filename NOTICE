@@ -1,13 +1,16 @@
-3T3R OS
+33.0S (3T3R OS) — by 3T3R ENGINEERING
 Copyright 2026 3T3R contributors
 
-This product includes software developed by:
-- The Buildroot project (https://buildroot.org/) — GPL-2.0
-- The Linux Foundation (https://www.kernel.org/) — GPL-2.0
-- The Reticulum Network Stack (https://reticulum.network/) — Reticulum License
-- libcodec2 (https://www.rowetel.com/?page_id=452) — LGPL-2.1
+This product includes software developed by 3T3R Engineering,
+the engineering division of 3T3R (https://3t3r.com).
 
-Apps integrated as release artifacts (not redistributed source):
-- 3T3R app (https://github.com/Hei33enberg/3T3R) — proprietary
-- 3T3R agent (Python Hermes fork from Nous Research) — MIT
-- mosADD OS (https://github.com/Hei33enberg/mosadd-os) — Apache 2.0
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The names "33.0S", "3T3R" and "3T3R ENGINEERING", the 3T3R sign
+(logo-512.png) and the images in img/ are not licensed under
+Apache-2.0. See TRADEMARK.md.
+
+This repository does not include third-party source code. The Rust
+crates in services/ depend on third-party crates from crates.io
+(listed in Cargo.lock); each is distributed under its own license
+and none is vendored here.

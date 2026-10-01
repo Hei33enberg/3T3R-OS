@@ -1,15 +1,17 @@
-# 3T3R OS Architecture
+# Radio-node prototype — architecture
+
+> **Status: experimental.** This document describes an earlier radio-node prototype: an embedded Linux device with long-range radio. It is not the 33.0S frame and it is not a product. Only the services in Layer 6 have code in this repository; the other layers are design notes.
 
 ## Layered design
 
 ```
 ┌─────────────────────────────────────────────────┐
 │ Layer 7: Apps (release artifacts, NOT source)   │
-│   cymru-main PWA bundle                         │
-│   cymru-agent Python package                    │
-│   @m0ssad/mcp npm package                       │
+│   3T3R app (web bundle)                         │
+│   agent runtime (Python package)                │
+│   @mosadd/mcp npm package                       │
 ├─────────────────────────────────────────────────┤
-│ Layer 6: cymru-os system services (this repo)   │
+│ Layer 6: system services (this repo)            │
 │   cymru-radio-d (Rust) — LoRa/HF modem driver  │
 │   cymru-bridge-d — D-Bus IPC                   │
 │   cymru-mesh-d — Reticulum routing             │
@@ -37,9 +39,9 @@
 
 ## Critical principle
 
-3T3R OS **does not modify** the 3T3R app or mosADD OS source code. We pull **release artifacts** (latest stable from GitHub Releases / npm) and install them as systemd units.
+The radio node **does not modify** the 3T3R app or mosADD-OS source code. We pull **release artifacts** (latest stable from GitHub Releases / npm) and install them as systemd units.
 
-The apps don't know they're running on 3T3R RAYDIO — unless they opt-in by calling the D-Bus IPC bridge `org.cymru.Radio`.
+The apps don't know they're running on the radio node — unless they opt-in by calling the D-Bus IPC bridge `org.cymru.Radio`.
 
 ## D-Bus IPC contract
 
@@ -92,4 +94,4 @@ Forward error correction: Reed-Solomon RS(255, 223) on data type, RS(255, 191) o
 2. Carrier availability (regulatory + RSSI)
 3. Cost (HF is "free" airtime, LoRa has duty cycle constraints under EN 300 220)
 
-Tool capability flags from `@m0ssad/mcp` (`requires: "network" | "radio" | "any"`) filter which apps can use which transport.
+Tool capability flags from `@mosadd/mcp` (`requires: "network" | "radio" | "any"`) filter which apps can use which transport.

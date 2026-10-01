@@ -1,21 +1,23 @@
 # RFC 0001 — Radio frame format
 
 **Status:** draft
-**Authors:** Major Boga (3T3R)
+**Authors:** 3T3R Engineering
 **Target release:** v0.1.0 (with cymru-radio-d C3)
+
+> Part of the experimental radio-node prototype — not the 33.0S frame and not a
+> product. "Frame" here means a radio packet on the air.
 
 ## Context
 
-3T3R RAYDIO devices communicate over LoRa (ISM 868/915 MHz) and optional HF
+Radio-node devices communicate over LoRa (ISM 868/915 MHz) and optional HF
 radio. The wire format must be:
 
 1. **Magic-byte distinguishable** from any other LoRa/HF protocol so receivers
    can drop foreign packets cheaply at the modem layer
 2. **Length-prefixed** so the receiver can frame without ambiguity
 3. **FEC-protected** because LoRa link is lossy and HF is lossier still
-4. **Encryption-agnostic** at this layer — keys come from `@m0ssad/crypto`'s
-   Double Ratchet on the app side, and from cymru-main's voice biometric on
-   the device side. cymru-radio-d does not decrypt.
+4. **Encryption-agnostic** at this layer — payloads arrive already encrypted
+   by the apps. cymru-radio-d does not decrypt.
 
 ## Frame format
 
@@ -32,7 +34,6 @@ Offset   Size   Field
 `0xC9 0xB0` chosen because:
 - High bits set on both bytes → unlikely false positive on noise/null fill
 - Not collide with KISS frame escapes (0xC0, 0xDB) or AX.25 flag (0x7E)
-- Mnemonic: "C" + "Bog" — the God of the ETER
 
 ### KISS payload
 
@@ -43,7 +44,7 @@ Type byte:
   0x01 = data (Reed-Solomon RS(255, 223))
   0x02 = control (Reed-Solomon RS(255, 223))
   0x03 = voice (Codec2 1300 bps, Reed-Solomon RS(255, 191))
-  0x04 = robot-dispatch (CRCP, deterministic CBOR; FEC by safety_class — see RFC 0003)
+  0x04 = robot dispatch (reserved; specification not public)
 
 Sender ID:    16 bytes (random per-device, persistent in /etc/cymru/identity)
 Recipient ID: 16 bytes (or 0xFF * 16 for broadcast)
@@ -51,9 +52,9 @@ Channel ID:   4 bytes (mIRC channel hash or 0x00000000 for mDM)
 Application payload: variable
 ```
 
-The application payload is opaque to cymru-radio-d. cymru-main sees PTT voice
-turns; cymru-agent sees skill-dispatch envelopes; mosadd-mcp sees mDM
-messages.
+The application payload is opaque to cymru-radio-d. The 3T3R app sees PTT
+voice turns; the agent runtime sees skill-dispatch envelopes; @mosadd/mcp sees
+mDM messages.
 
 ## FEC choice
 
@@ -82,7 +83,7 @@ if the hinted one is unavailable.
 
 ## Open questions
 
-- [ ] Reed-Solomon block boundary handling for payloads > 223 bytes (CRCP 0x04 fragmentation defined in RFC 0003 §4; generalize?)
+- [ ] Reed-Solomon block boundary handling for payloads > 223 bytes
 - [ ] Bluetooth LE as additional carrier for short-range device-to-device
 - [ ] M17 protocol compatibility (M17 is a competing open ham radio protocol)
 - [ ] Backoff and ARQ at this layer or at app layer?
